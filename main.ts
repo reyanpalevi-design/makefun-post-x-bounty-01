@@ -26,6 +26,15 @@ if (typeof url !== 'string' || !/^https:\/\/(x|twitter)\.com\/[^/]+\/status\/\d+
   process.exit(1);
 }
 
+// The starter's placeholder (x.com/<handle>/status/<id>) already fails the
+// digit check above, but angle brackets or a zero id can only come from a
+// hand-edited file that was never a real post: refuse those explicitly so
+// the mistake is obvious instead of surfacing as a gate refusal later.
+if (/[<>]/.test(url) || url.endsWith('/status/0')) {
+  console.error(`POST.json still holds a placeholder address: ${url}`);
+  process.exit(1);
+}
+
 const raw = readFileSync(postPath, 'utf8');
 if (Buffer.byteLength(raw, 'utf8') > 16384) {
   console.error(`POST.json is too large: ${Buffer.byteLength(raw, 'utf8')} bytes`);
